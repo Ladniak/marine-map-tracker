@@ -46,3 +46,8 @@ body {
   overflow-x: hidden;
   font-family: "Roboto", sans-serif;
 }
+
+.custom-icon {
+  font-size: 24px;
+  transform-origin: center;
+}

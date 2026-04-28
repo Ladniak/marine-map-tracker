@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import MapView from "../components/Map/MapView";
-import StationsPanel from "../components/panels/StationsPanel";
-import ObjectsPanel from "../components/panels/ObjectsPanel";
-import SignalsPanel from "../components/panels/SignalsPanel";
+import MapView from "../../components/Map/MapView";
+import ObjectsPanel from "../../components/panels/ObjectsPanel";
+import StationsPanel from "../../components/panels/StationsPanel";
+import SignalsPanel from "../../components/panels/SignalsPanel";
+import SensorsPanel from "../../components/panels/SensorsPanel/SensorsPanel";
 
-import { stations } from "../mock/stations";
-import { objects as initialObjects } from "../mock/objects";
-import { signals } from "../mock/signals";
+import { stations } from "../../mock/stations";
+import { objects as initialObjects } from "../../mock/objects";
+import { signals } from "../../mock/signals";
+
+import module from "./HomePage.module.css";
 
 export default function HomePage() {
   const [animatedObjects, setAnimatedObjects] = useState(initialObjects);
@@ -45,20 +48,27 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="page">
-      <div className="page__map">
+    <div className={module.trackerLayout}>
+      <aside className={module.trackerPanel}>
+        <h1 className={module.trackerTitle}>Tracked objects</h1>
+        <div className={module.objectContainer}>
+          <ObjectsPanel objects={animatedObjects} />
+        </div>
+      </aside>
+
+      <main className={module.trackerMap}>
         <MapView
+          className={module.mapWrapper}
           stations={stations}
           objects={animatedObjects}
           signals={signals}
         />
-      </div>
+      </main>
 
-      <div className="page__sidebar">
-        <StationsPanel stations={stations} />
-        <ObjectsPanel objects={animatedObjects} />
-        <SignalsPanel signals={signals} />
-      </div>
+      <aside className={module.trackerPanel}>
+        <h2 className={module.trackerTitle}>Sensors</h2>
+        <SensorsPanel stations={stations} signals={signals} />
+      </aside>
     </div>
   );
 }

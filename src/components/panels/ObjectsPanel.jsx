@@ -1,10 +1,12 @@
+import module from "./Panel.module.css";
+
 export default function ObjectsPanel({ objects }) {
   return (
-    <div className="panel">
+    <div className={module.Panel}>
       <h2>Objects</h2>
 
       {objects.map((objectItem) => (
-        <div key={objectItem.id} className="panel-item">
+        <div key={objectItem.id} className={module.PanelWrapper}>
           <p>
             <strong>ID:</strong> {objectItem.id}
           </p>

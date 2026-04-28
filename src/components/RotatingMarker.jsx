@@ -1,4 +1,4 @@
-import { Marker, useMap } from "react-leaflet";
+import { Marker } from "react-leaflet";
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet-rotatedmarker";

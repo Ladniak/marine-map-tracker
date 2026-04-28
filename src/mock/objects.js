@@ -1,0 +1,47 @@
+export const objects = [
+  {
+    id: "object-1",
+    latitude: 55.68,
+    longitude: 12.57,
+    speed: 5.4,
+    direction: 135.0,
+    detectedAt: "2026-04-07T20:01:00Z",
+    signals: ["signal-1", "signal-2"],
+    path: [
+      [55.68, 12.57],
+      [55.6792, 12.5714],
+      [55.6784, 12.5728],
+      [55.6776, 12.5742],
+    ],
+  },
+  {
+    id: "object-2",
+    latitude: 55.6905,
+    longitude: 12.5605,
+    speed: 3.2,
+    direction: 220.0,
+    detectedAt: "2026-04-07T20:03:00Z",
+    signals: ["signal-2"],
+    path: [
+      [55.6905, 12.5605],
+      [55.6897, 12.5594],
+      [55.6889, 12.5583],
+      [55.6881, 12.5572],
+    ],
+  },
+  {
+    id: "object-3",
+    latitude: 55.6702,
+    longitude: 12.5901,
+    speed: 6.8,
+    direction: 75.0,
+    detectedAt: "2026-04-07T20:04:30Z",
+    signals: ["signal-1", "signal-3"],
+    path: [
+      [55.6702, 12.5901],
+      [55.6711, 12.592],
+      [55.672, 12.5939],
+      [55.6729, 12.5958],
+    ],
+  },
+];

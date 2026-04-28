@@ -1,12 +1,30 @@
 import { Marker, Popup } from "react-leaflet";
 
-export default function StationsLayer({ stations }) {
+export default function StationsLayer({
+  stations,
+  signals,
+  selectedObject,
+  onSelectStation,
+}) {
+  const visibleStations = selectedObject
+    ? stations.filter((station) =>
+        signals.some(
+          (signal) =>
+            selectedObject.signals.includes(signal.id) &&
+            signal.stationId === station.id,
+        ),
+      )
+    : stations;
+
   return (
     <>
-      {stations.map((station) => (
+      {visibleStations.map((station) => (
         <Marker
           key={station.id}
           position={[station.latitude, station.longitude]}
+          eventHandlers={{
+            click: () => onSelectStation(station.id),
+          }}
         >
           <Popup>
             <div>

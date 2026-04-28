@@ -150,3 +150,11 @@
   left: 0;
   top: 50%;
 }
+
+.activeObjectLabel {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background-color: #e3f2fd;
+  border: 1px solid #1976d2;
+  font-size: 14px;
+}

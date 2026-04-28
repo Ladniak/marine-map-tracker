@@ -6,7 +6,14 @@ import ObjectsLayer from "./ObjectsLayer";
 import SignalsLayer from "./SignalLayer";
 import ObjectPathsLayer from "./ObjectPathsLayer";
 
-export default function MapView({ stations, objects, signals, className }) {
+export default function MapView({
+  stations,
+  objects,
+  signals,
+  selectedObject,
+  onSelectStation,
+  className,
+}) {
   return (
     <div className={className}>
       <MapContainer
@@ -16,8 +23,18 @@ export default function MapView({ stations, objects, signals, className }) {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        <SignalsLayer stations={stations} signals={signals} />
-        <StationsLayer stations={stations} />
+        <SignalsLayer
+          stations={stations}
+          signals={signals}
+          selectedObject={selectedObject}
+        />
+
+        <StationsLayer
+          stations={stations}
+          signals={signals}
+          selectedObject={selectedObject}
+          onSelectStation={onSelectStation}
+        />
         <ObjectPathsLayer objects={objects} />
         <ObjectsLayer objects={objects} />
       </MapContainer>

@@ -9,15 +9,20 @@ function getSignalEndPoint(latitude, longitude, azimuth, length = 0.02) {
   return [newLat, newLng];
 }
 
-export default function SignalsLayer({ stations, signals }) {
+export default function SignalsLayer({ stations, signals, selectedObject }) {
+  const visibleSignals = selectedObject
+    ? signals.filter((signal) => selectedObject.signals.includes(signal.id))
+    : signals;
+
   return (
     <>
-      {signals.map((signal) => {
+      {visibleSignals.map((signal) => {
         const station = stations.find((item) => item.id === signal.stationId);
 
         if (!station) return null;
 
         const start = [station.latitude, station.longitude];
+
         const end = getSignalEndPoint(
           station.latitude,
           station.longitude,
@@ -29,9 +34,9 @@ export default function SignalsLayer({ stations, signals }) {
             key={signal.id}
             positions={[start, end]}
             pathOptions={{
-              color: "#ff9800",
-              weight: 3,
-              opacity: 0.8,
+              color: selectedObject ? "#ff3d00" : "#ff9800",
+              weight: selectedObject ? 4 : 3,
+              opacity: selectedObject ? 1 : 0.75,
               dashArray: "8, 8",
             }}
           >
@@ -41,17 +46,19 @@ export default function SignalsLayer({ stations, signals }) {
                   <strong>Signal:</strong> {signal.id}
                 </p>
                 <p>
-                  <strong>Station ID:</strong> {signal.stationId}
+                  <strong>Station:</strong> {signal.stationId}
                 </p>
                 <p>
                   <strong>Azimuth:</strong> {signal.azimuth}
                 </p>
                 <p>
-                  <strong>Corrected azimuth:</strong> {signal.correctedAzimuth}
+                  <strong>Corrected:</strong> {signal.correctedAzimuth}
                 </p>
                 <p>
-                  <strong>Timestamp:</strong>{" "}
-                  {new Date(signal.timestamp).toLocaleString()}
+                  <strong>Objects:</strong>{" "}
+                  {signal.objectIds?.length
+                    ? signal.objectIds.join(", ")
+                    : "No object"}
                 </p>
               </div>
             </Popup>

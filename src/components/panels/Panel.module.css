@@ -3,10 +3,42 @@
 .Panel {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
 .PanelWrapper {
-  border: 1px solid black;
-  padding: 5px;
+  width: 100%;
+  display: block;
+  padding: 12px;
+  border: 1px solid #777;
+  background-color: #ffffff;
+  color: #000000;
+  text-align: left;
+  font: inherit;
+  border-radius: 0;
+}
+
+.PanelWrapper:hover {
+  background-color: #f0f7ff;
+  border-color: #1976d2;
+}
+
+.ActivePanelWrapper {
+  background-color: #e3f2fd;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+.ClearButton {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: #34495e;
+  color: #ffffff;
+  font-weight: 600;
+  text-align: center;
+}
+
+.ClearButton:hover {
+  background-color: #2c3e50;
 }

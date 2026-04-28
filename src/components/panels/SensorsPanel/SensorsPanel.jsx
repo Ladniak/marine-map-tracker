@@ -10,11 +10,25 @@ function Inclinometer() {
   );
 }
 
-export default function SensorsPanel({ stations, signals }) {
+export default function SensorsPanel({ stations, signals, selectedObject }) {
+  const visibleSignals = selectedObject
+    ? signals.filter((signal) => selectedObject.signals.includes(signal.id))
+    : signals;
+
+  const visibleStations = stations.filter((station) =>
+    visibleSignals.some((signal) => signal.stationId === station.id),
+  );
+
   return (
     <div className={module.sensorsPanel}>
-      {stations.map((station, index) => {
-        const stationSignal = signals.find(
+      {selectedObject && (
+        <p className={module.activeObjectLabel}>
+          Active object: <strong>{selectedObject.id}</strong>
+        </p>
+      )}
+
+      {visibleStations.map((station, index) => {
+        const stationSignal = visibleSignals.find(
           (signal) => signal.stationId === station.id,
         );
 
@@ -30,6 +44,13 @@ export default function SensorsPanel({ stations, signals }) {
             <CompassGauge angle={angle} />
 
             <p className={module.value}>Azimuth: {angle}°</p>
+
+            <p className={module.value}>
+              Objects:{" "}
+              {stationSignal?.objectIds?.length > 0
+                ? stationSignal.objectIds.join(", ")
+                : "No object"}
+            </p>
 
             <p className={module.label}>Inclinometer</p>
             <Inclinometer />

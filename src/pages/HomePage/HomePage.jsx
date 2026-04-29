@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MapView from "../../components/Map/MapView";
 import ObjectsPanel from "../../components/panels/ObjectsPanel";
 import SensorsPanel from "../../components/panels/SensorsPanel/SensorsPanel";
@@ -50,12 +50,61 @@ function getBearingIntersection(stationA, bearingA, stationB, bearingB) {
   };
 }
 
+function getBearingFromStationToPoint(station, point) {
+  const avgLatRad = (((station.latitude + point[0]) / 2) * Math.PI) / 180;
+
+  const y = point[0] - station.latitude;
+  const x = (point[1] - station.longitude) * Math.cos(avgLatRad);
+
+  return normalizeAngle((Math.atan2(x, y) * 180) / Math.PI);
+}
+
 export default function HomePage() {
   const [selectedObjectId, setSelectedObjectId] = useState(null);
   const [mobilePanel, setMobilePanel] = useState(null);
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStep((prevStep) => prevStep + 1);
+    }, 1200);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const animatedSignals = useMemo(() => {
+    return signals.map((signal) => {
+      const relatedObject = initialObjects.find((objectItem) =>
+        objectItem.signals.includes(signal.id),
+      );
+
+      const station = stations.find((item) => item.id === signal.stationId);
+
+      if (!relatedObject || !station || !relatedObject.path?.length) {
+        return signal;
+      }
+
+      const currentPoint = relatedObject.path[step % relatedObject.path.length];
+
+      const correctedAzimuth = getBearingFromStationToPoint(
+        station,
+        currentPoint,
+      );
+
+      const azimuth = normalizeAngle(
+        correctedAzimuth - station.magneticCorrection,
+      );
+
+      return {
+        ...signal,
+        azimuth: Number(azimuth.toFixed(1)),
+        correctedAzimuth: Number(correctedAzimuth.toFixed(1)),
+      };
+    });
+  }, [step]);
 
   const signalsWithObjects = useMemo(() => {
-    return signals.map((signal) => {
+    return animatedSignals.map((signal) => {
       const relatedObjects = initialObjects.filter((objectItem) =>
         objectItem.signals.includes(signal.id),
       );
@@ -65,12 +114,14 @@ export default function HomePage() {
         objectIds: relatedObjects.map((objectItem) => objectItem.id),
       };
     });
-  }, []);
+  }, [animatedSignals]);
 
   const triangulatedObjects = useMemo(() => {
     return initialObjects.map((objectItem) => {
       const objectSignals = objectItem.signals
-        .map((signalId) => signals.find((signal) => signal.id === signalId))
+        .map((signalId) =>
+          signalsWithObjects.find((signal) => signal.id === signalId),
+        )
         .filter(Boolean);
 
       if (objectSignals.length < 2) {
@@ -103,15 +154,27 @@ export default function HomePage() {
         return objectItem;
       }
 
+      const path = objectItem.path ?? [];
+      const currentPoint = path[step % path.length];
+      const nextPoint = path[(step + 1) % path.length];
+
+      let direction = objectItem.direction;
+
+      if (currentPoint && nextPoint) {
+        const dx = nextPoint[1] - currentPoint[1];
+        const dy = nextPoint[0] - currentPoint[0];
+        direction = normalizeAngle((Math.atan2(dx, dy) * 180) / Math.PI);
+      }
+
       return {
         ...objectItem,
         latitude: intersection.latitude,
         longitude: intersection.longitude,
-        direction: normalizeAngle(objectItem.direction),
+        direction,
         triangulated: true,
       };
     });
-  }, []);
+  }, [signalsWithObjects, step]);
 
   const selectedObject = triangulatedObjects.find(
     (objectItem) => objectItem.id === selectedObjectId,
@@ -121,17 +184,14 @@ export default function HomePage() {
     if (!selectedObject) return [];
 
     return selectedObject.signals
-      .map((signalId) => {
-        const signal = signalsWithObjects.find((item) => item.id === signalId);
-
-        if (!signal) return null;
-
-        return {
-          ...signal,
-          objectIds: [selectedObject.id],
-        };
-      })
-      .filter(Boolean);
+      .map((signalId) =>
+        signalsWithObjects.find((signal) => signal.id === signalId),
+      )
+      .filter(Boolean)
+      .map((signal) => ({
+        ...signal,
+        objectIds: [selectedObject.id],
+      }));
   }, [selectedObject, signalsWithObjects]);
 
   const handleSelectStation = (stationId) => {

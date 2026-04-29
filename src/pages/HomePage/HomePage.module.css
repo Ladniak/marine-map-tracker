@@ -84,14 +84,12 @@
   display: none;
 }
 
-/* Tablet */
 @media (max-width: 1100px) {
   .trackerLayout {
     grid-template-columns: 240px 1fr 280px;
   }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
   .trackerLayout {
     display: block;

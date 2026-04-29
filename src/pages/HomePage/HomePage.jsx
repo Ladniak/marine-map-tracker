@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import MapView from "../../components/Map/MapView";
 import ObjectsPanel from "../../components/panels/ObjectsPanel";
 import SensorsPanel from "../../components/panels/SensorsPanel/SensorsPanel";
@@ -9,51 +9,54 @@ import { signals } from "../../mock/signals";
 
 import module from "./HomePage.module.css";
 
+function normalizeAngle(angle) {
+  return (angle + 360) % 360;
+}
+
+function getBearingIntersection(stationA, bearingA, stationB, bearingB) {
+  const refLat =
+    (((stationA.latitude + stationB.latitude) / 2) * Math.PI) / 180;
+  const cosRef = Math.cos(refLat);
+
+  const x1 = stationA.longitude * cosRef;
+  const y1 = stationA.latitude;
+
+  const x2 = stationB.longitude * cosRef;
+  const y2 = stationB.latitude;
+
+  const angleA = (bearingA * Math.PI) / 180;
+  const angleB = (bearingB * Math.PI) / 180;
+
+  const dx1 = Math.sin(angleA);
+  const dy1 = Math.cos(angleA);
+
+  const dx2 = Math.sin(angleB);
+  const dy2 = Math.cos(angleB);
+
+  const denominator = dx1 * dy2 - dy1 * dx2;
+
+  if (Math.abs(denominator) < 0.000001) {
+    return null;
+  }
+
+  const t = ((x2 - x1) * dy2 - (y2 - y1) * dx2) / denominator;
+
+  const intersectionX = x1 + t * dx1;
+  const intersectionY = y1 + t * dy1;
+
+  return {
+    latitude: intersectionY,
+    longitude: intersectionX / cosRef,
+  };
+}
+
 export default function HomePage() {
-  const [animatedObjects, setAnimatedObjects] = useState(initialObjects);
   const [selectedObjectId, setSelectedObjectId] = useState(null);
   const [mobilePanel, setMobilePanel] = useState(null);
 
-  useEffect(() => {
-    let step = 0;
-
-    const interval = setInterval(() => {
-      setAnimatedObjects((prevObjects) =>
-        prevObjects.map((objectItem) => {
-          if (!objectItem.path || objectItem.path.length === 0) {
-            return objectItem;
-          }
-
-          const nextPoint = objectItem.path[step % objectItem.path.length];
-          const nextPointAfter =
-            objectItem.path[(step + 1) % objectItem.path.length];
-
-          const dx = nextPointAfter[1] - nextPoint[1];
-          const dy = nextPointAfter[0] - nextPoint[0];
-          const angle = (Math.atan2(dx, dy) * 180) / Math.PI;
-
-          return {
-            ...objectItem,
-            latitude: nextPoint[0],
-            longitude: nextPoint[1],
-            direction: angle,
-          };
-        }),
-      );
-
-      step += 1;
-    }, 1200);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const selectedObject = animatedObjects.find(
-    (objectItem) => objectItem.id === selectedObjectId,
-  );
-
   const signalsWithObjects = useMemo(() => {
     return signals.map((signal) => {
-      const relatedObjects = animatedObjects.filter((objectItem) =>
+      const relatedObjects = initialObjects.filter((objectItem) =>
         objectItem.signals.includes(signal.id),
       );
 
@@ -62,7 +65,74 @@ export default function HomePage() {
         objectIds: relatedObjects.map((objectItem) => objectItem.id),
       };
     });
-  }, [animatedObjects]);
+  }, []);
+
+  const triangulatedObjects = useMemo(() => {
+    return initialObjects.map((objectItem) => {
+      const objectSignals = objectItem.signals
+        .map((signalId) => signals.find((signal) => signal.id === signalId))
+        .filter(Boolean);
+
+      if (objectSignals.length < 2) {
+        return objectItem;
+      }
+
+      const firstSignal = objectSignals[0];
+      const secondSignal = objectSignals[1];
+
+      const firstStation = stations.find(
+        (station) => station.id === firstSignal.stationId,
+      );
+
+      const secondStation = stations.find(
+        (station) => station.id === secondSignal.stationId,
+      );
+
+      if (!firstStation || !secondStation) {
+        return objectItem;
+      }
+
+      const intersection = getBearingIntersection(
+        firstStation,
+        firstSignal.correctedAzimuth,
+        secondStation,
+        secondSignal.correctedAzimuth,
+      );
+
+      if (!intersection) {
+        return objectItem;
+      }
+
+      return {
+        ...objectItem,
+        latitude: intersection.latitude,
+        longitude: intersection.longitude,
+        direction: normalizeAngle(objectItem.direction),
+        triangulated: true,
+      };
+    });
+  }, []);
+
+  const selectedObject = triangulatedObjects.find(
+    (objectItem) => objectItem.id === selectedObjectId,
+  );
+
+  const selectedObjectSignals = useMemo(() => {
+    if (!selectedObject) return [];
+
+    return selectedObject.signals
+      .map((signalId) => {
+        const signal = signalsWithObjects.find((item) => item.id === signalId);
+
+        if (!signal) return null;
+
+        return {
+          ...signal,
+          objectIds: [selectedObject.id],
+        };
+      })
+      .filter(Boolean);
+  }, [selectedObject, signalsWithObjects]);
 
   const handleSelectStation = (stationId) => {
     const stationSignals = signalsWithObjects.filter(
@@ -78,13 +148,18 @@ export default function HomePage() {
     }
   };
 
+  const mapSignals = selectedObject ? selectedObjectSignals : [];
+  const sensorSignals = selectedObject
+    ? selectedObjectSignals
+    : signalsWithObjects;
+
   return (
     <div className={module.trackerLayout}>
       <aside className={module.trackerPanel}>
         <h1 className={module.trackerTitle}>Tracked objects</h1>
 
         <ObjectsPanel
-          objects={animatedObjects}
+          objects={triangulatedObjects}
           selectedObjectId={selectedObjectId}
           onSelectObject={setSelectedObjectId}
           onClearSelection={() => setSelectedObjectId(null)}
@@ -115,8 +190,8 @@ export default function HomePage() {
         <MapView
           className={module.mapWrapper}
           stations={stations}
-          objects={animatedObjects}
-          signals={signalsWithObjects}
+          objects={triangulatedObjects}
+          signals={mapSignals}
           selectedObject={selectedObject}
           onSelectStation={handleSelectStation}
         />
@@ -127,7 +202,7 @@ export default function HomePage() {
 
         <SensorsPanel
           stations={stations}
-          signals={signalsWithObjects}
+          signals={sensorSignals}
           selectedObject={selectedObject}
         />
       </aside>
@@ -157,7 +232,7 @@ export default function HomePage() {
 
             {mobilePanel === "objects" && (
               <ObjectsPanel
-                objects={animatedObjects}
+                objects={triangulatedObjects}
                 selectedObjectId={selectedObjectId}
                 onSelectObject={(id) => {
                   setSelectedObjectId(id);
@@ -173,7 +248,7 @@ export default function HomePage() {
             {mobilePanel === "sensors" && (
               <SensorsPanel
                 stations={stations}
-                signals={signalsWithObjects}
+                signals={sensorSignals}
                 selectedObject={selectedObject}
               />
             )}

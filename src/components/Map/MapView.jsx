@@ -3,8 +3,7 @@ import "leaflet/dist/leaflet.css";
 
 import StationsLayer from "./StationsLayer";
 import ObjectsLayer from "./ObjectsLayer";
-import SignalsLayer from "./SignalLayer";
-import ObjectPathsLayer from "./ObjectPathsLayer";
+import SignalLayer from "./SignalLayer";
 
 export default function MapView({
   stations,
@@ -23,7 +22,7 @@ export default function MapView({
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-        <SignalsLayer
+        <SignalLayer
           stations={stations}
           signals={signals}
           selectedObject={selectedObject}
@@ -35,7 +34,7 @@ export default function MapView({
           selectedObject={selectedObject}
           onSelectStation={onSelectStation}
         />
-        <ObjectPathsLayer objects={objects} />
+
         <ObjectsLayer objects={objects} />
       </MapContainer>
     </div>

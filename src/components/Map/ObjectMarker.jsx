@@ -24,24 +24,50 @@ export default function ObjectMarker({ objectItem }) {
           <p>
             <strong>Object:</strong> {objectItem.id}
           </p>
+
           <p>
-            <strong>Latitude:</strong> {objectItem.latitude.toFixed(4)}
+            <strong>Latitude:</strong> {objectItem.latitude?.toFixed?.(4)}
           </p>
+
           <p>
-            <strong>Longitude:</strong> {objectItem.longitude.toFixed(4)}
+            <strong>Longitude:</strong> {objectItem.longitude?.toFixed?.(4)}
           </p>
+
           <p>
-            <strong>Speed:</strong> {objectItem.speed}
+            <strong>Speed:</strong> {objectItem.speed ?? "—"}
           </p>
+
           <p>
-            <strong>Direction:</strong> {objectItem.direction.toFixed(1)}°
+            <strong>Direction:</strong>{" "}
+            {objectItem.direction !== undefined
+              ? `${Number(objectItem.direction).toFixed(1)}°`
+              : "—"}
           </p>
+
           <p>
-            <strong>Detected at:</strong>{" "}
-            {new Date(objectItem.detectedAt).toLocaleString()}
+            <strong>Status:</strong> {objectItem.status ?? "—"}
           </p>
+
           <p>
-            <strong>Signals:</strong> {objectItem.signals.join(", ")}
+            <strong>Confidence:</strong>{" "}
+            {objectItem.confidence !== undefined
+              ? `${Math.round(objectItem.confidence * 100)}%`
+              : "—"}
+          </p>
+
+          <p>
+            <strong>Detections:</strong> {objectItem.detectionCount ?? "—"}
+          </p>
+
+          <p>
+            <strong>Last seen:</strong>{" "}
+            {objectItem.detectedAt
+              ? new Date(objectItem.detectedAt).toLocaleString("uk-UA")
+              : "—"}
+          </p>
+
+          <p>
+            <strong>Signals count:</strong> {objectItem.signals?.length || 0}
           </p>
         </div>
       </Popup>

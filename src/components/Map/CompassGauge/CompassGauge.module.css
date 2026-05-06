@@ -1,0 +1,57 @@
+.compassGauge {
+  width: 150px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.compassGaugeSvg {
+  width: 150px;
+  height: 150px;
+}
+
+.compassGaugeOuter {
+  fill: #f8fafc;
+  stroke: #2c3e50;
+  stroke-width: 3;
+}
+
+.compassGaugeInner {
+  fill: none;
+  stroke: #cfd8dc;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 4;
+}
+
+.compassGaugeCenter {
+  fill: #2c3e50;
+}
+
+.compassGaugeMark {
+  stroke: #2c3e50;
+  stroke-width: 2;
+}
+
+.compassGaugeLabel {
+  font-size: 12px;
+  font-weight: 700;
+  fill: #2c3e50;
+}
+
+.compassGaugeNorth {
+  fill: #d62828;
+}
+
+.compassGaugeNeedleNorth {
+  fill: #d62828;
+}
+
+.compassGaugeNeedleSouth {
+  fill: #34495e;
+  opacity: 0.75;
+}
+
+.compassGaugeAngle {
+  margin-top: -6px;
+  font-size: 13px;
+  font-weight: 700;
+}

@@ -1,5 +1,5 @@
 import module from "./SensorsPanel.module.css";
-import CompassGauge from "../../Map/CompassGauge";
+import CompassGauge from "../../Map/CompassGauge/CompassGauge";
 
 function Inclinometer() {
   return (
@@ -11,14 +11,6 @@ function Inclinometer() {
 }
 
 export default function SensorsPanel({ stations, signals, selectedObject }) {
-  const visibleSignals = selectedObject
-    ? signals.filter((signal) => selectedObject.signals.includes(signal.id))
-    : signals;
-
-  const visibleStations = stations.filter((station) =>
-    visibleSignals.some((signal) => signal.stationId === station.id),
-  );
-
   return (
     <div className={module.sensorsPanel}>
       {selectedObject && (
@@ -27,12 +19,14 @@ export default function SensorsPanel({ stations, signals, selectedObject }) {
         </p>
       )}
 
-      {visibleStations.map((station, index) => {
-        const stationSignal = visibleSignals.find(
-          (signal) => signal.stationId === station.id,
+      {stations.map((station, index) => {
+        const stationSignals = signals.filter(
+          (signal) => String(signal.stationId) === String(station.id),
         );
 
-        const angle = stationSignal?.correctedAzimuth ?? 0;
+        const stationSignal = stationSignals.at(0);
+        const angle = stationSignal?.correctedAzimuth ?? null;
+        const objectIds = stationSignal?.objectIds ?? [];
 
         return (
           <div key={station.id} className={module.sensorCard}>
@@ -41,15 +35,23 @@ export default function SensorsPanel({ stations, signals, selectedObject }) {
             <p className={module.sensorName}>{station.id}</p>
 
             <p className={module.label}>Compass</p>
-            <CompassGauge angle={angle} />
 
-            <p className={module.value}>Azimuth: {angle}°</p>
+            {angle !== null ? (
+              <CompassGauge angle={angle} />
+            ) : (
+              <p className={module.noSignal}>No azimuth data</p>
+            )}
+
+            <p className={module.value}>
+              Azimuth:{" "}
+              {angle !== null ? `${Number(angle).toFixed(1)}°` : "No signal"}
+            </p>
 
             <p className={module.value}>
               Objects:{" "}
-              {stationSignal?.objectIds?.length > 0
-                ? stationSignal.objectIds.join(", ")
-                : "No object"}
+              {objectIds.length > 0
+                ? objectIds.join(", ")
+                : "waiting for triangulation..."}
             </p>
 
             <p className={module.label}>Inclinometer</p>

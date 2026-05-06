@@ -18,40 +18,52 @@ export default function ObjectsPanel({
         </button>
       )}
 
-      {objects.map((objectItem) => {
-        const isActive = objectItem.id === selectedObjectId;
+      {objects.length === 0 ? (
+        <p className={module.EmptyMessage}>No tracked objects</p>
+      ) : (
+        objects.map((objectItem) => {
+          const isActive = objectItem.id === selectedObjectId;
 
-        return (
-          <button
-            key={objectItem.id}
-            type="button"
-            className={`${module.PanelWrapper} ${
-              isActive ? module.ActivePanelWrapper : ""
-            }`}
-            onClick={() => onSelectObject(objectItem.id)}
-          >
-            <p>
-              <strong>ID:</strong> {objectItem.id}
-            </p>
-            <p>
-              <strong>Lat:</strong> {objectItem.latitude.toFixed(4)}
-            </p>
-            <p>
-              <strong>Lng:</strong> {objectItem.longitude.toFixed(4)}
-            </p>
-            <p>
-              <strong>Speed:</strong> {objectItem.speed}
-            </p>
-            <p>
-              <strong>Direction:</strong> {objectItem.direction.toFixed(1)}°
-            </p>
-            <p>
-              <strong>Detected:</strong>{" "}
-              {new Date(objectItem.detectedAt).toLocaleString("uk-UA")}
-            </p>
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={objectItem.id}
+              type="button"
+              className={`${module.PanelWrapper} ${
+                isActive ? module.ActivePanelWrapper : ""
+              }`}
+              onClick={() => onSelectObject(objectItem.id)}
+            >
+              <p>
+                <strong>ID:</strong> {objectItem.id}
+              </p>
+              <p>
+                <strong>Lat:</strong> {objectItem.latitude?.toFixed?.(4)}
+              </p>
+              <p>
+                <strong>Lng:</strong> {objectItem.longitude?.toFixed?.(4)}
+              </p>
+              <p>
+                <strong>Speed:</strong> {objectItem.speed ?? "—"}
+              </p>
+              <p>
+                <strong>Direction:</strong>{" "}
+                {objectItem.direction !== undefined
+                  ? `${Number(objectItem.direction).toFixed(1)}°`
+                  : "—"}
+              </p>
+              <p>
+                <strong>Detected:</strong>{" "}
+                {objectItem.detectedAt
+                  ? new Date(objectItem.detectedAt).toLocaleString("uk-UA")
+                  : "—"}
+              </p>
+              <p>
+                <strong>Status:</strong> {objectItem.status ?? "—"}
+              </p>
+            </button>
+          );
+        })
+      )}
     </div>
   );
 }

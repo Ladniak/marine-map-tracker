@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 
-function createObjectIcon(direction) {
+function createObjectIcon(direction = 0) {
   return L.divIcon({
     className: "object-icon-wrapper",
     html: `
@@ -14,62 +15,97 @@ function createObjectIcon(direction) {
   });
 }
 
-export default function ObjectMarker({ objectItem }) {
-  const icon = createObjectIcon(objectItem.direction);
+function ObjectPopup({ objectItem }) {
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   return (
-    <Marker position={[objectItem.latitude, objectItem.longitude]} icon={icon}>
-      <Popup>
-        <div>
-          <p>
-            <strong>Object:</strong> {objectItem.id}
-          </p>
+    <div>
+      <p>
+        <strong>Object:</strong> {objectItem.id}
+      </p>
 
+      {!isDetailsOpen ? (
+        <>
           <p>
-            <strong>Latitude:</strong> {objectItem.latitude?.toFixed?.(4)}
+            <strong>Lat:</strong> {objectItem.latitude?.toFixed?.(4)}
           </p>
-
           <p>
-            <strong>Longitude:</strong> {objectItem.longitude?.toFixed?.(4)}
+            <strong>Lng:</strong> {objectItem.longitude?.toFixed?.(4)}
           </p>
-
           <p>
             <strong>Speed:</strong> {objectItem.speed ?? "—"}
           </p>
-
+          <p>
+            <strong>Status:</strong> {objectItem.status ?? "—"}
+          </p>
+        </>
+      ) : (
+        <>
           <p>
             <strong>Direction:</strong>{" "}
             {objectItem.direction !== undefined
               ? `${Number(objectItem.direction).toFixed(1)}°`
               : "—"}
           </p>
-
-          <p>
-            <strong>Status:</strong> {objectItem.status ?? "—"}
-          </p>
-
           <p>
             <strong>Confidence:</strong>{" "}
             {objectItem.confidence !== undefined
               ? `${Math.round(objectItem.confidence * 100)}%`
               : "—"}
           </p>
-
           <p>
             <strong>Detections:</strong> {objectItem.detectionCount ?? "—"}
           </p>
-
           <p>
-            <strong>Last seen:</strong>{" "}
-            {objectItem.detectedAt
-              ? new Date(objectItem.detectedAt).toLocaleString("uk-UA")
+            <strong>First seen:</strong>{" "}
+            {objectItem.firstSeen
+              ? new Date(objectItem.firstSeen).toLocaleString("uk-UA")
               : "—"}
           </p>
-
+          <p>
+            <strong>Last seen:</strong>{" "}
+            {objectItem.lastSeen || objectItem.detectedAt
+              ? new Date(
+                  objectItem.lastSeen || objectItem.detectedAt,
+                ).toLocaleString("uk-UA")
+              : "—"}
+          </p>
           <p>
             <strong>Signals count:</strong> {objectItem.signals?.length || 0}
           </p>
-        </div>
+        </>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setIsDetailsOpen((prev) => !prev)}
+        style={{
+          marginTop: "10px",
+          width: "100%",
+          padding: "8px 12px",
+          border: "none",
+          borderRadius: "8px",
+          backgroundColor: isDetailsOpen ? "#455a64" : "#1976d2",
+          color: "#ffffff",
+          fontSize: "13px",
+          fontWeight: 600,
+          cursor: "pointer",
+          transition: "0.2s",
+        }}
+      >
+        {isDetailsOpen ? "Back" : "Details"}
+      </button>
+    </div>
+  );
+}
+
+export default function ObjectMarker({ objectItem }) {
+  const icon = createObjectIcon(objectItem.direction);
+
+  return (
+    <Marker position={[objectItem.latitude, objectItem.longitude]} icon={icon}>
+      <Popup>
+        <ObjectPopup objectItem={objectItem} />
       </Popup>
     </Marker>
   );

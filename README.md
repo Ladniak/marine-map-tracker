@@ -27,7 +27,7 @@ Marine Map Tracker — це вебзастосунок для візуаліза
 - Інтерактивні popup-вікна;
 - Автоматичне оновлення даних із backend API;
 - Responsive UI для desktop та mobile;
-- Інтеграція з WebSocket/API backend.
+- Інтеграція з REST API backend.
 
 ---
 
@@ -55,6 +55,7 @@ Marine Map Tracker — це вебзастосунок для візуаліза
 - Node.js >= 18
 - npm >= 9
 - Git
+- Visual Studio Code (рекомендовано)
 
 Рекомендована ОС:
 
@@ -63,6 +64,16 @@ Marine Map Tracker — це вебзастосунок для візуаліза
 - macOS
 
 ---
+
+# Backend API
+
+Для коректної роботи frontend-застосунку необхідно запустити backend API сервіс Hydrosa.
+
+## Backend API URL
+
+```text
+https://hydrosa-production.up.railway.app
+```
 
 # Встановлення проєкту
 
@@ -94,4 +105,10 @@ npm install
 
 ```sh
 npm run dev
+```
+
+### Перейти в браузері за хостом:
+
+```sh
+http://localhost:5173/
 ```

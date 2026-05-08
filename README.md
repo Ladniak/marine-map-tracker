@@ -81,6 +81,13 @@ Marine Map Tracker — це вебзастосунок для візуаліза
 
 ```text
 .env
+```
+
+В цьому файлі створити VITE_API_BASE_URL= та присвоїти посилання на бекенд
+
+```bash
+https://hydrosa-production.up.railway.app
+```
 
 # Встановлення проєкту
 

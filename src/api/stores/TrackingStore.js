@@ -76,20 +76,22 @@ export class TrackingStore {
   }
 
   get adaptedObjects() {
-    return this.objects.map((objectItem) => ({
-      id: objectItem.id,
-      latitude: objectItem.latitude,
-      longitude: objectItem.longitude,
-      speed: objectItem.estimatedSpeed,
-      direction: objectItem.estimatedDirection,
-      detectedAt: objectItem.lastSeen,
-      lastSeen: objectItem.lastSeen,
-      firstSeen: objectItem.firstSeen,
-      detectionCount: objectItem.detectionCount,
-      confidence: objectItem.confidence,
-      status: objectItem.status,
-      signals: this.getRelatedSignalIdsForObject(objectItem),
-    }));
+    return this.objects
+      .map((objectItem) => ({
+        id: objectItem.id,
+        latitude: objectItem.latitude,
+        longitude: objectItem.longitude,
+        speed: objectItem.estimatedSpeed,
+        direction: objectItem.estimatedDirection,
+        detectedAt: objectItem.lastSeen,
+        lastSeen: objectItem.lastSeen,
+        firstSeen: objectItem.firstSeen,
+        detectionCount: objectItem.detectionCount,
+        confidence: objectItem.confidence,
+        status: objectItem.status,
+        signals: this.getRelatedSignalIdsForObject(objectItem),
+      }))
+      .sort((a, b) => new Date(a.firstSeen) - new Date(b.firstSeen));
   }
 
   get selectedObject() {

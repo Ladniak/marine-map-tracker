@@ -71,9 +71,21 @@ Marine Map Tracker — це вебзастосунок для візуаліза
 
 ## Backend API URL
 
-Потрібно створити .env з значенням VITE_API_BASE_URL=
+Для підключення frontend-застосунку до backend API необхідно створити файл `.env` у корені проєкту.
+
+### Як створити файл `.env`
+
+1. Відкрити проєкт у Visual Studio Code.
+2. У лівій панелі знайти кореневу папку проєкту `marine-map-tracker`.
+3. У корені проєкту створити новий файл з назвою:
 
 ```text
+.env
+```
+
+В цьому файлі створити VITE_API_BASE_URL= та присвоїти посилання на бекенд
+
+```bash
 https://hydrosa-production.up.railway.app
 ```
 

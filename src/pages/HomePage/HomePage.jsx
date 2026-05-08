@@ -72,6 +72,7 @@ function HomePage() {
           objects={trackingStore.adaptedObjects}
           signals={trackingStore.mapSignals}
           selectedObject={trackingStore.selectedObject}
+          historyPath={trackingStore.selectedObjectHistoryPath}
           onSelectStation={trackingStore.handleSelectStation}
         />
       </main>

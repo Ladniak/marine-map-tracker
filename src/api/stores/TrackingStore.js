@@ -2,6 +2,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 import { getStations } from "../stationsApi";
 import { getSignals } from "../signalsApi";
 import { getTrackedObjects } from "../trackedObjectsApi";
+import { getObjectHistory } from "../historyApi";
 
 function normalizeAngle(angle) {
   return (angle + 360) % 360;
@@ -25,6 +26,7 @@ export class TrackingStore {
   stations = [];
   signals = [];
   objects = [];
+  objectHistory = [];
 
   selectedObjectId = null;
 
@@ -124,12 +126,26 @@ export class TrackingStore {
     );
   }
 
+  get selectedObjectHistoryPath() {
+    return this.objectHistory
+      .map((point) => [point.latitude, point.longitude])
+      .filter(
+        ([latitude, longitude]) =>
+          typeof latitude === "number" && typeof longitude === "number",
+      );
+  }
+
   setSelectedObjectId = (id) => {
     this.selectedObjectId = id;
+
+    if (id) {
+      this.loadObjectHistory(id);
+    }
   };
 
   clearSelection = () => {
     this.selectedObjectId = null;
+    this.objectHistory = [];
   };
 
   loadInitialData = async () => {
@@ -147,6 +163,28 @@ export class TrackingStore {
         this.error = error.message;
         this.loading = false;
       });
+    }
+  };
+
+  loadObjectHistory = async (id) => {
+    try {
+      const history = await getObjectHistory(id);
+
+      runInAction(() => {
+        this.objectHistory = Array.isArray(history) ? history : [];
+      });
+
+      console.log("Object history:", id, history);
+
+      return history;
+    } catch (error) {
+      console.error("Failed to load object history:", error);
+
+      runInAction(() => {
+        this.objectHistory = [];
+      });
+
+      return [];
     }
   };
 

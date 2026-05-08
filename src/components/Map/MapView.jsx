@@ -2,10 +2,10 @@ import { useEffect, useRef } from "react";
 import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-
 import StationsLayer from "./StationsLayer";
 import ObjectsLayer from "./ObjectsLayer";
 import SignalLayer from "./SignalLayer";
+import HistoryPathLayer from "./HistoryPathLayer";
 
 function InitialMapBounds({ stations, objects }) {
   const map = useMap();
@@ -47,6 +47,7 @@ export default function MapView({
   selectedObject,
   onSelectStation,
   className,
+  historyPath,
 }) {
   return (
     <div className={className}>
@@ -72,6 +73,7 @@ export default function MapView({
           onSelectStation={onSelectStation}
         />
 
+        <HistoryPathLayer historyPath={historyPath} />
         <ObjectsLayer objects={objects} />
       </MapContainer>
     </div>

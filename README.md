@@ -71,6 +71,8 @@ Marine Map Tracker — це вебзастосунок для візуаліза
 
 ## Backend API URL
 
+Потрібно створити .env з значенням VITE_API_BASE_URL=
+
 ```text
 https://hydrosa-production.up.railway.app
 ```

@@ -3,24 +3,12 @@ import { getStations } from "../stationsApi";
 import { getSignals } from "../signalsApi";
 import { getTrackedObjects } from "../trackedObjectsApi";
 import { getObjectHistory } from "../historyApi";
-
-function normalizeAngle(angle) {
-  return (angle + 360) % 360;
-}
-
-function angleDifference(a, b) {
-  const diff = Math.abs(normalizeAngle(a) - normalizeAngle(b));
-  return Math.min(diff, 360 - diff);
-}
-
-function calculateBearing(fromLat, fromLng, toLat, toLng) {
-  const avgLatRad = (((fromLat + toLat) / 2) * Math.PI) / 180;
-
-  const y = toLat - fromLat;
-  const x = (toLng - fromLng) * Math.cos(avgLatRad);
-
-  return normalizeAngle((Math.atan2(x, y) * 180) / Math.PI);
-}
+import {
+  normalizeAngle,
+  angleDifference,
+  calculateBearing,
+  buildHistoryPath,
+} from "../../utils/trackingUtils.js";
 
 export class TrackingStore {
   stations = [];
@@ -127,12 +115,7 @@ export class TrackingStore {
   }
 
   get selectedObjectHistoryPath() {
-    return this.objectHistory
-      .map((point) => [point.latitude, point.longitude])
-      .filter(
-        ([latitude, longitude]) =>
-          typeof latitude === "number" && typeof longitude === "number",
-      );
+    return buildHistoryPath(this.objectHistory);
   }
 
   setSelectedObjectId = (id) => {

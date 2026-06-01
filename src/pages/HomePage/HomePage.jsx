@@ -19,7 +19,7 @@ function HomePage() {
 
     const intervalId = setInterval(() => {
       trackingStore.refreshData();
-    }, 3000);
+    }, 10000);
 
     return () => clearInterval(intervalId);
   }, [trackingStore]);

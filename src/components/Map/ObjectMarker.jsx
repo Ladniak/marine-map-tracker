@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useState } from "react";
 import { Marker, Popup } from "react-leaflet";
 import L from "leaflet";
@@ -100,7 +101,10 @@ function ObjectPopup({ objectItem }) {
 }
 
 export default function ObjectMarker({ objectItem }) {
-  const icon = createObjectIcon(objectItem.direction);
+  const icon = useMemo(
+    () => createObjectIcon(objectItem.direction),
+    [objectItem.direction],
+  );
 
   return (
     <Marker position={[objectItem.latitude, objectItem.longitude]} icon={icon}>

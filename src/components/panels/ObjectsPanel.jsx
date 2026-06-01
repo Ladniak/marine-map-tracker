@@ -43,7 +43,7 @@ export default function ObjectsPanel({
                 <strong>Lng:</strong> {objectItem.longitude?.toFixed?.(4)}
               </p>
               <p>
-                <strong>Speed:</strong> {objectItem.speed ?? "—"}
+                <strong>Speed:</strong> {objectItem.speed ?? "—"} kn
               </p>
               <p>
                 <strong>Direction:</strong>{" "}
